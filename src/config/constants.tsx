@@ -12,6 +12,6 @@ const globalMenu = [
       ]},
     ],
   },
-  ,
+
 ];
 export {globalMenu};
