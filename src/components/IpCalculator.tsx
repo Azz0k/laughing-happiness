@@ -2,6 +2,7 @@ import { observer } from "mobx-react";
 import {Input, Button, Radio} from "antd";
 import {globalState} from "../stores/GlobalState.tsx";
 import {Address4} from "ip-address";
+import {cidrToMask} from "../config/constants.tsx";
 
 const IpCalculator = observer(()=> {
     const radioButtons = Array.from({ length:31 }, (_, i) =>
@@ -10,11 +11,16 @@ const IpCalculator = observer(()=> {
         </Radio.Button>
     );
     let networkAddress = "";
+    let firstHost = "";
+    let lastHost = "";
     let broadcastAddress = "";
     if (globalState.ipCalcValidated) {
         const ipAddressObject = new Address4(`${globalState.ipCalcAddress}/${globalState.ipCalcMask}`);
         networkAddress = ipAddressObject.startAddress().address;
         broadcastAddress = ipAddressObject.endAddress().address;
+        firstHost = ipAddressObject.startAddressExclusive().address;
+        lastHost = ipAddressObject.endAddressExclusive().address;
+
     }
     return(
         <>
@@ -36,7 +42,10 @@ const IpCalculator = observer(()=> {
             </div>
             <Button onClick={globalState.validateIpCalcAddress}>Calculate</Button>
             {globalState.ipCalcValidated && <p>Network: {networkAddress}</p>}
+            {globalState.ipCalcValidated && <p>First address: {firstHost}</p>}
+            {globalState.ipCalcValidated && <p>Last address: {lastHost}</p>}
             {globalState.ipCalcValidated && <p>Broadcast: {broadcastAddress}</p>}
+            {globalState.ipCalcValidated && <p>Mask: {cidrToMask[globalState.ipCalcMask]}</p>}
         </>
     );
 });
