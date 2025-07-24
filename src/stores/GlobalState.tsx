@@ -7,6 +7,9 @@ class GlobalState {
   public ipCalcMask = 24;
   public ipCalcAddress: string = "";
   public ipCalcValidated:boolean = false;
+  public fetching = false;
+  public error = "";
+  public vlanData = null;
 
   constructor() {
     makeAutoObservable(this);
@@ -29,7 +32,25 @@ class GlobalState {
     const pattern =/^((25[0-5]|(2[0-4]|1\d|[1-9]|)\d)\.?\b){4}$/;
     this.ipCalcValidated = pattern.test(this.ipCalcAddress);
   }
-
+  async fetchDataVlanApi (organizationId:number) {
+    this.fetching = true;
+    this.error = "";
+    try{
+      console.log(organizationId);
+      const response = await fetch(`https://localhost:7172/vlans/${organizationId}`);
+      const data = await response.json();
+      this.vlanData = data;
+      console.log(data);
+    }
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    catch(e){
+      console.log(e);
+      this.error = "Error fetching data";
+    }
+    finally {
+      this.fetching = false;
+    }
+  }
 }
 
 const globalState = new GlobalState();
